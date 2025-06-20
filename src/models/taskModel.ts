@@ -24,7 +24,7 @@ const taskSchema = new Schema(
       type: String,
       required: [true, 'Description is required'],
       trim: true,
-      maxlength: [1000, 'Description cannot exeed 1000 characters']
+      maxlength: [1000, 'Description cannot exv 1000 characters']
     },
     category: {
       type: String,
