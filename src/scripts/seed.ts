@@ -102,5 +102,6 @@ const seedDatabase = async () => {
   }
 };
 
+//lol
 
 seedDatabase();
