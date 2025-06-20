@@ -3,8 +3,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import { notFound } from "./controllers/notFoundController";
-import testRoutes from "./routes/exampleRoutes";
-import { helloMiddleware } from "./middleware/exampleMiddleware";
+import taskRoutes from "./routes/taskRoutes";
 import mongoose from "mongoose";
 
 // Variables
@@ -16,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api", helloMiddleware, testRoutes);
+app.use("/api", taskRoutes );
 app.all("*", notFound);
 
 // Database connection
