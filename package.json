@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "npx tsx watch ./src/server.ts",
     "build": "pkgroll --clean-dist --minify",
-    "start": "node dist/server.mjs"
+    "start": "node dist/server.mjs",
+    "seed": "tsx ./src/scripts/seed.ts",
+    "clear": "tsx ./src/scripts/clear.ts"
   },
   "keywords": [],
   "author": "",
