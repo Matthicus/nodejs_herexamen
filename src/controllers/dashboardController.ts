@@ -49,3 +49,94 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
     });
   }
 };
+
+export const getTaskDetails = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const taskId = req.params.id;
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      res.status(404).render('error', {
+        message: 'Task not found',
+        error: 'The requested task does not exist'
+      });
+      return;
+    }
+
+    if (task.dueDate && task.dueDate < new Date()) {
+      res.status(404).render('error', {
+        message: 'Task not found',
+        error: 'This task has expired'
+      });
+      return;
+    }
+
+    res.render('task-detail', { task });
+  } catch (error) {
+    console.log('Error getting task:', error);
+    res.status(500).render('error', {
+      message: 'Error loading task',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+export const deleteTask = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const taskId = req.params.id;
+    const deletedTask = await Task.findByIdAndDelete(taskId);
+
+    if (!deletedTask) {
+      res.status(404).render('error', {
+        message: 'Task not found',
+        error: 'Could not delete task'
+      });
+      return;
+    }
+
+    res.redirect('/?message=Task deleted successfully');
+  } catch (error) {
+    console.log('Error deleting task:', error);
+    res.status(500).render('error', {
+      message: 'Error deleting task',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+export const editTask = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const taskId = req.params.id;
+    const { title, description, category, priority, dueDate } = req.body;
+
+    const updateData: Record<string, unknown> = {};
+    
+    if (title) updateData.title = title.trim();
+    if (description) updateData.description = description.trim();
+    if (category) updateData.category = category.trim();
+    if (priority) updateData.priority = priority.toLowerCase();
+    if (dueDate) updateData.dueDate = new Date(dueDate);
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTask) {
+      res.status(404).render('error', {
+        message: 'Task not found',
+        error: 'Could not update task'
+      });
+      return;
+    }
+
+    res.redirect('/?message=Task updated successfully');
+  } catch (error) {
+    console.log('Error updating task:', error);
+    res.status(500).render('error', {
+      message: 'Error updating task',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};

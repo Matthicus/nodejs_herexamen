@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Task Management Dashboard</h1>
+            <p class="subtitle">Manage your tasks efficiently</p>
+        </header>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="categoryFilter">Category:</label>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="all" <%= currentCategory === 'all' ? 'selected' : '' %>>All Categories</option>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category %>" <%= currentCategory === category ? 'selected' : '' %>>
+                            <%= category %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="priorityFilter">Priority:</label>
+                <select id="priorityFilter" class="filter-select">
+                    <option value="all" <%= currentPriority === 'all' ? 'selected' : '' %>>All Priorities</option>
+                    <% priorities.forEach(priority => { %>
+                        <option value="<%= priority %>" <%= currentPriority === priority ? 'selected' : '' %>>
+                            <%= priority.charAt(0).toUpperCase() + priority.slice(1) %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <button id="clearFilters" class="btn btn-secondary">Clear Filters</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3><%= totalTasks %></h3>
+                <p>Active Tasks</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <% if (tasks.length > 0) { %>
+                <table class="tasks-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Due Date</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% tasks.forEach(task => { %>
+                            <tr class="task-row">
+                                <td class="task-title">
+                                    <strong><%= task.title %></strong>
+                                </td>
+                                <td class="task-description">
+                                    <%= task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description %>
+                                </td>
+                                <td>
+                                    <span class="category-badge">
+                                        <%= task.category %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="priority-badge priority-<%= task.priority %>">
+                                        <%= task.priority.charAt(0).toUpperCase() + task.priority.slice(1) %>
+                                    </span>
+                                </td>
+                                <td class="due-date">
+                                    <% if (task.dueDate) { %>
+                                        <% const dueDate = new Date(task.dueDate); %>
+                                        <span class="date-badge">
+                                            <%= dueDate.toLocaleDateString('en-US', { 
+                                                year: 'numeric', 
+                                                month: 'short', 
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            }) %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="date-badge no-date">
+                                            No due date
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <td class="created-date">
+                                    <% const createdDate = new Date(task.createdAt); %>
+                                    <%= createdDate.toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'short', 
+                                        day: 'numeric'
+                                    }) %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <div class="no-tasks">
+                    <h3>No tasks found</h3>
+                    <p>No tasks match your current filters.</p>
+                </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2025 Task Management System</p>
+        </footer>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
