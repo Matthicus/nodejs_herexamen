@@ -277,3 +277,177 @@ export const editTask = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
+
+export const showCreateForm = async (req: Request, res: Response): Promise<void> => {
+  try {
+  
+    const allTasks = await Task.find({
+      $or: [
+        { dueDate: { $exists: false } },
+        { dueDate: { $gte: new Date() } }
+      ]
+    });
+    
+    const categories = [...new Set(allTasks.map(task => task.category))].sort();
+    const priorities = ['low', 'medium', 'high'];
+
+    res.render('createTask', { 
+      error: null, 
+      formData: {},
+      categories: categories,
+      priorities: priorities
+    });
+  } catch (error) {
+    console.log('Error loading create form:', error);
+    res.status(500).render('error', {
+      message: 'Error loading create form',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+
+export const createTaskDashboard = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { title, description, category, priority, dueDate } = req.body;
+
+    
+    const allTasks = await Task.find({
+      $or: [
+        { dueDate: { $exists: false } },
+        { dueDate: { $gte: new Date() } }
+      ]
+    });
+    const categories = [...new Set(allTasks.map(task => task.category))].sort();
+    const priorities = ['low', 'medium', 'high'];
+
+  
+    if (!title || !description || !category || !priority) {
+      res.render('createTask', {
+        error: 'All fields (title, description, category, priority) are required',
+        formData: req.body,
+        categories: categories,
+        priorities: priorities
+      });
+      return;
+    }
+
+  
+    if (title.length > 200) {
+      res.render('createTask', {
+        error: 'Title must be 200 characters or less',
+        formData: req.body,
+        categories: categories,
+        priorities: priorities
+      });
+      return;
+    }
+
+  
+    if (description.length > 1000) {
+      res.render('createTask', {
+        error: 'Description must be 1000 characters or less',
+        formData: req.body,
+        categories: categories,
+        priorities: priorities
+      });
+      return;
+    }
+
+   
+    if (category.length > 100) {
+      res.render('createTask', {
+        error: 'Category must be 100 characters or less',
+        formData: req.body,
+        categories: categories,
+        priorities: priorities
+      });
+      return;
+    }
+
+   
+    if (!['low', 'medium', 'high'].includes(priority.toLowerCase())) {
+      res.render('createTask', {
+        error: 'Priority must be low, medium, or high',
+        formData: req.body,
+        categories: categories,
+        priorities: priorities
+      });
+      return;
+    }
+
+    if (dueDate) {
+      const dueDateObj = new Date(dueDate);
+      const now = new Date();
+      
+      if (isNaN(dueDateObj.getTime())) {
+        res.render('createTask', {
+          error: 'Invalid due date format. Please use a valid date and time.',
+          formData: req.body,
+          categories: categories,
+          priorities: priorities
+        });
+        return;
+      }
+      
+      if (dueDateObj <= now) {
+        res.render('createTask', {
+          error: 'Due date must be in the future',
+          formData: req.body,
+          categories: categories,
+          priorities: priorities
+        });
+        return;
+      }
+    }
+
+   
+    const newTask = {
+      title: title.trim(),
+      description: description.trim(),
+      category: category.trim(),
+      priority: priority.toLowerCase() as 'low' | 'medium' | 'high',
+      ...(dueDate && { dueDate: new Date(dueDate) })
+    };
+
+    const task = new Task(newTask);
+    await task.save();
+
+    res.redirect('/?message=Task created successfully');
+  } catch (error) {
+    console.log('Error creating task:', error);
+    
+   
+    try {
+      const allTasks = await Task.find({
+        $or: [
+          { dueDate: { $exists: false } },
+          { dueDate: { $gte: new Date() } }
+        ]
+      });
+      const categories = [...new Set(allTasks.map(task => task.category))].sort();
+      const priorities = ['low', 'medium', 'high'];
+
+      let errorMessage = 'Error creating task';
+      
+      if (error instanceof Error && error.name === 'ValidationError') {
+        errorMessage = error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      res.render('createTask', {
+        error: errorMessage,
+        formData: req.body,
+        categories: categories,
+        priorities: priorities
+      });
+    } catch (fetchError) {
+  
+      res.status(500).render('error', {
+        message: 'Error creating task',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+};
