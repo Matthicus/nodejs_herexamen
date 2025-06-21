@@ -1,40 +1,42 @@
 import { Request, Response } from 'express';
 import { Task, ITask } from '../models/taskModel';
 
-export const createTask = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { title, description, category, priority, dueDate } = req.body;
+// export const createTask = async (req: Request, res: Response): Promise<void> => {
+//   try {
+//     const { title, description, category, priority, dueDate } = req.body;
 
-    if (!title || !description || !category || !priority) {
-      res.status(400).json({
-        message: 'Title, description, category, and priority are required'
-      });
-      return;
-    }
+//     if (!title || !description || !category || !priority) {
+//       res.status(400).json({
+//         message: 'Title, description, category, and priority are required'
+//       });
+//       return;
+//     }
 
-    const newTask: Partial<ITask> = {
-      title: title.trim(),
-      description: description.trim(),
-      category: category.trim(),
-      priority: priority.toLowerCase() as 'low' | 'medium' | 'high'
-    };
+//     const newTask: Partial<ITask> = {
+//       title: title.trim(),
+//       description: description.trim(),
+//       category: category.trim(),
+//       priority: priority.toLowerCase() as 'low' | 'medium' | 'high'
+//     };
 
-    if (dueDate) {
-      newTask.dueDate = new Date(dueDate);
-    }
+//     if (dueDate) {
+//       newTask.dueDate = new Date(dueDate);
+//     }
 
-    const task = new Task(newTask);
-    const result = await task.save();
+//     const task = new Task(newTask);
+//     const result = await task.save();
 
-    res.status(201).json(result);
-  } catch (error) {
-    console.log('Error creating task:', error);
-    res.status(400).json({ 
-      message: error instanceof Error ? error.message : 'Could not create task'
-    });
-  }
-};
+//     res.status(201).json(result);
+//   } catch (error) {
+//     console.log('Error creating task:', error);
+//     res.status(400).json({ 
+//       message: error instanceof Error ? error.message : 'Could not create task'
+//     });
+//   }
+// };
 
+
+//post function, had pas laat door dat deze niet required was voor de opdracht
 export const getAllTasks = async (req: Request, res: Response): Promise<void> => {
   try {
     const categoryFilter = req.query.category as string;

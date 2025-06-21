@@ -65,6 +65,8 @@ A Node.js REST API with TypeScript for managing tasks, built with Express, Mongo
    ```
    PORT=3000
    MONGO_URI=mongodb://127.0.0.1:27017/taskmanagement
+   # For MongoDB Atlas use:
+   # MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
    ```
 4. Start MongoDB service
 
@@ -208,7 +210,7 @@ The API handles various error scenarios:
 ### Environment Variables
 
 ```
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/taskmanagement
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
 PORT=3000
 ```
 
@@ -216,5 +218,3 @@ PORT=3000
 
 - Build: `npm install && npm run build`
 - Start: `npm start`
-
--> gemaakt door chatgpt (might have some inconsistencies), ben zeer moe
